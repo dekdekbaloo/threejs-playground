@@ -17,6 +17,7 @@
     "three": "^0.89.0"
   },
   "devDependencies": {
+    "chalk": "^2.3.0",
     "eslint-config-es2015": "^1.1.0",
     "html-webpack-harddisk-plugin": "^0.1.0",
     "html-webpack-plugin": "^2.30.1",
