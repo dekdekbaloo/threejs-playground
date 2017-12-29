@@ -1,0 +1,4 @@
+{
+  "presets": [ "env" ],
+  "plugins": [ "syntax-flow", "tcomb", "transform-flow-strip-types" ]
+}

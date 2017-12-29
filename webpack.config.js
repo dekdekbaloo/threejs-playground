@@ -9,7 +9,8 @@ const entries = {
     html: './src/index.html'
   },
   steer: {
-    js: './src/steer/index.js'
+    js: './src/steer/index.js',
+    html: './src/steer/index.html'
   }
 }
 function generateEntryPoints (entries) {
@@ -30,7 +31,7 @@ function generateHtmlWebpackPlugins (entries) {
       chunks: [ name ],
       alwaysWriteToDisk: true
     }
-    if (html) options.html = html
+    if (html) options.template = html
     console.log(chalk.cyan('entry:'), name, chalk.cyan('options:\n'), options)
     return new HtmlWebpackPlugin(options)
   })
@@ -40,6 +41,25 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].bundle.js'
+  },
+  module: {
+    rules: [
+      {
+        test: /.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['env'],
+            plugins: [
+              'syntax-flow',
+              'tcomb',
+              'transform-flow-strip-types'
+            ]
+          }
+        }
+      }
+    ]
   },
   devServer: {
     publicPath: '/',
