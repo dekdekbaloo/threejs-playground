@@ -67,6 +67,7 @@ module.exports = {
     port: 8000,
     inline: true
   },
+  devtool: process.env.NODE_ENV === 'development' ? 'eval-source-map' : false,
   plugins: [
     ...generateHtmlWebpackPlugins(entries),
     new HtmlWebpackHarddiskPlugin()
