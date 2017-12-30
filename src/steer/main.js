@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 
 import SimpleVechicle from './SimpleVechicle'
+import UniformGrid from './UniformGrid'
+import cuid from 'cuid'
 
 const OrbitControls = require('three-orbit-controls')(THREE)
 
@@ -15,10 +17,16 @@ const plane = new THREE.Mesh(
   invisibleMaterial
 )
 scene.add(plane)
-
+const withID = (BaseClass) => (class extends BaseClass {
+  constructor (...args) {
+    super(...args)
+    this.id = cuid()
+  }
+})
+const SimpleVechicleWithId = withID(SimpleVechicle)
 const vehicles = []
 for (let i = 0; i < 1000; i++) {
-  const vehicle = new SimpleVechicle(
+  const vehicle = new SimpleVechicleWithId(
     Math.random() * 5 + 1,
     new THREE.Vector3(Math.random() * 100 - 50, Math.random() * 100 - 50, 0),
     new THREE.Vector3(0, 0, 0),
@@ -51,6 +59,11 @@ function onMouseMove (event) {
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
 }
+const uniformGrid = new UniformGrid(
+  new THREE.Vector3(0, 0, 0),
+  new THREE.Vector3(1000, 1000, 1000),
+  10
+)
 
 function animate () {
   raycaster.setFromCamera(mouse, camera)
@@ -60,13 +73,12 @@ function animate () {
     vehicles.forEach((v: SimpleVechicle, i: number) => {
       if (v.position.distanceTo(target) > 30) {
         v.arrival(target, 25, 4, 0.1)
-        // v.seek(target)
       } else {
         v.flee(target)
       }
     })
   }
-
+  // TODO: Optimize this using UniformGrid.
   vehicles.forEach((vi: SimpleVechicle) => {
     let neighbors = [ ]
     for (let j = 0; j < vehicles.length; j++) {
@@ -78,7 +90,10 @@ function animate () {
     vi.separate(neighbors, 2)
   })
 
-  vehicles.forEach((v: SimpleVechicle) => v.update())
+  vehicles.forEach((v: SimpleVechicleWithId) => {
+    v.update()
+    uniformGrid.register(v)
+  })
   controls.update()
 
   window.requestAnimationFrame(animate)
